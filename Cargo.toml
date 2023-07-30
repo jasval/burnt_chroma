@@ -2,6 +2,14 @@
 name = "burnt_chroma"
 version = "0.1.0"
 edition = "2021"
+description = "A general purpose image manipulation library"
+readme = "README.md"
+homepage = "https://jaspervaldivia.dev"
+repository = "https://github.com/jasval/burnt_chroma"
+license = "Apache-2.0"
+license-file = "LICENSE.txt"
+keywords = ["anamorphic", "image", "desqueeze", "stretch"]
+categories = ["multimedia::images", "multimedia", "graphics", "command-line-utilities", "external-ffi-bindings"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
