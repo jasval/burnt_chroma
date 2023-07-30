@@ -11,6 +11,7 @@ license-file = "LICENSE"
 keywords = ["anamorphic", "image", "desqueeze", "stretch"]
 categories = ["multimedia::images", "multimedia", "graphics", "command-line-utilities", "external-ffi-bindings"]
 include = ["src/**/*", "LICENSE", "README.md", "!**/*.jpeg"]
+exclude = [".DS_Store"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
