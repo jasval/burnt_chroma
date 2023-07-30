@@ -14,16 +14,14 @@
    limitations under the License.
 */
 
-mod processor {
-    use image::{imageops::FilterType, GenericImageView, ImageError};
-    use std::path::{Path, PathBuf};
+#[cfg(debug_assertions)]
+macro_rules! debug_println {
+    ($($args:tt)*) => { println!($($args)*) };
+}
 
-    pub fn process_image(image_path: &str) -> Result<String, ImageError> {
-        println!("Processing...");
-        let image = image::open(image_path)?;
-        image.save("src/tests/output/landscape.png")?;
-        return Ok("src/tests/output/landscape.png".to_string());
-    }
+mod processor {
+    use image::{imageops::FilterType, GenericImageView, ImageError, ImageFormat};
+    use std::path::{Path, PathBuf};
 
     pub enum SqueezeFactor {
         X1_33,
@@ -46,12 +44,23 @@ mod processor {
     pub fn desqueeze_image(
         image_path: &str,
         output_path: &str,
+        image_format: Option<ImageFormat>,
         squeeze_factor: SqueezeFactor,
     ) -> Result<String, ImageError> {
-        println!("Identifying file name...");
+        debug_println!("Identifying file name...");
 
         let image_path = Path::new(image_path);
-        let mut file_name = image_path
+
+        let target_image_format = image_format
+            .unwrap_or_else(|| {
+                image::ImageFormat::from_path(image_path).unwrap_or(ImageFormat::Png)
+            })
+            .extensions_str()
+            .first()
+            .unwrap_or(&"png")
+            .to_string();
+
+        let file_name = image_path
             .file_stem()
             .unwrap_or_else(|| image_path.as_os_str())
             .to_str()
@@ -60,27 +69,27 @@ mod processor {
 
         let output_path = Path::new(output_path);
 
-        println!("{}", output_path.to_string_lossy());
-        println!("Checking if output directory exists...");
+        debug_println!("{}", output_path.to_string_lossy());
+        debug_println!("Checking if output directory exists...");
         if !output_path.try_exists()? {
-            println!("Creating output directory...");
+            debug_println!("Creating output directory...");
             std::fs::create_dir(output_path)?;
         }
 
-        println!("Checking if outputh path is directory...");
-        let mut output_file_path: PathBuf;
+        debug_println!("Checking if outputh path is directory...");
+        let output_file_path: PathBuf;
 
         if output_path.is_dir() {
-            println!("Output path is directory");
-            output_file_path = output_path.join(format!("{}.png", file_name));
-            println!("Output path: {}", output_file_path.to_string_lossy());
+            debug_println!("Output path is directory");
+            output_file_path = output_path.join(format!("{}.{}", file_name, target_image_format));
+            debug_println!("Output path: {}", output_file_path.to_string_lossy());
         } else {
-            println!("Output path is not directory. Creating a new directory...");
-            output_file_path = output_path.join(format!("/{}.png", file_name));
-            println!("Output path: {}", output_file_path.to_string_lossy());
+            debug_println!("Output path is not directory. Creating a new directory...");
+            output_file_path = output_path.join(format!("/{}.{}", file_name, target_image_format));
+            debug_println!("Output path: {}", output_file_path.to_string_lossy());
         }
 
-        println!("Desqueezing {}...", file_name);
+        debug_println!("Desqueezing {}...", file_name);
 
         let image = image::open(image_path)?;
         let (width, height) = image.dimensions();
@@ -93,11 +102,11 @@ mod processor {
         } else if height > width {
             height *= squeeze_factor.value();
         } else {
-            println!("Do not desqueeze square images");
+            debug_println!("Do not desqueeze square images");
         }
 
         let path_ref = output_file_path.as_path();
-        println!("{}", path_ref.to_string_lossy());
+        debug_println!("{}", path_ref.to_string_lossy());
         let new_image = image.resize_exact(width as u32, height as u32, FilterType::Nearest);
         new_image.save(path_ref)?;
         return Ok(path_ref.to_string_lossy().to_string());
@@ -108,28 +117,19 @@ mod processor_tests {
     use super::processor;
 
     #[test]
-    fn should_process_image() {
-        let result = processor::process_image("src/tests/landscape.jpeg");
-        assert_eq!(result.is_ok(), true);
-        std::fs::remove_file("src/tests/output/landscape.png").unwrap_or_else(|error| {
-            println!("Error: {}", error);
-            return ();
-        });
-    }
-
-    #[test]
     fn should_desqueeze_landscape_image() {
         let result = processor::desqueeze_image(
             "src/tests/squeezedLandscape.jpeg",
             "src/tests/output/",
+            None,
             processor::SqueezeFactor::X1_33,
         );
 
         assert_eq!(result.is_ok(), true);
-        // std::fs::remove_file("src/tests/output/squeezedLandscape.png").unwrap_or_else(|error| {
-        //     println!("Error: {}", error);
-        //     return ();
-        // });
+        std::fs::remove_file("src/tests/output/squeezedLandscape.jpg").unwrap_or_else(|error| {
+            println!("Error: {}", error);
+            return ();
+        });
     }
 
     #[test]
@@ -137,12 +137,13 @@ mod processor_tests {
         let result = processor::desqueeze_image(
             "src/tests/squeezedPortrait.jpeg",
             "src/tests/output/",
+            None,
             processor::SqueezeFactor::X1_33,
         );
         assert_eq!(result.is_ok(), true);
-        // std::fs::remove_file("src/tests/output/squeezedPortrait.png").unwrap_or_else(|error| {
-        //     println!("Error: {}", error);
-        //     return ();
-        // });
+        std::fs::remove_file("src/tests/output/squeezedPortrait.jpg").unwrap_or_else(|error| {
+            println!("Error: {}", error);
+            return ();
+        });
     }
 }
