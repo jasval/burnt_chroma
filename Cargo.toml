@@ -7,7 +7,6 @@ readme = "README.md"
 homepage = "https://jaspervaldivia.dev"
 repository = "https://github.com/jasval/burnt_chroma"
 license = "Apache-2.0"
-license-file = "LICENSE"
 keywords = ["anamorphic", "image", "desqueeze", "stretch"]
 categories = ["multimedia::images", "multimedia", "graphics", "command-line-utilities", "external-ffi-bindings"]
 exclude = ["src/tests"]
@@ -29,13 +28,11 @@ swift-bridge-build = "0.1"
 
 [dependencies]
 image = "0.24.6"
-tokio = "1.29.1"
-swift-bridge = "0.1"
+tokio = { version = "1.29.1", features = ["macros"] }
+swift-bridge = { version = "0.1.52", features = ["async"] }
 
 [dev-dependencies]
 arbitrary = "1.3.0"
-test-case = "3.1.0"
-mockall = "0.11.4"
 
 [features]
 debug_assertions = []
