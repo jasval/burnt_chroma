@@ -1,12 +1,6 @@
 // swift-tools-version:5.5.0
 import PackageDescription
 let package = Package(
-	platforms: [
-		.macOS(.v10_15),
-		.iOS(.v13),
-		.tvOS(.v13),
-		.watchOS(.v6)
-	],
 	name: "SwiftBurntChroma",
 	products: [
 		.library(
@@ -22,7 +16,6 @@ let package = Package(
 		.target(
 			name: "SwiftBurntChroma",
 			dependencies: ["RustXcframework"])
-	],
-	version: "0.3.0"
+	]
 )
 	
