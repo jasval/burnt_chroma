@@ -42,8 +42,6 @@ pub mod processor {
         image_format: Option<ImageFormat>,
         squeeze_factor: SqueezeFactor,
     ) -> Result<String, ImageError> {
-        debug_println!("Identifying file name...");
-
         let image_path = Path::new(image_path);
 
         let target_image_format = image_format
@@ -64,27 +62,17 @@ pub mod processor {
 
         let output_path = Path::new(output_path);
 
-        debug_println!("{}", output_path.to_string_lossy());
-        debug_println!("Checking if output directory exists...");
         if !output_path.try_exists()? {
-            debug_println!("Creating output directory...");
             std::fs::create_dir(output_path)?;
         }
 
-        debug_println!("Checking if outputh path is directory...");
         let output_file_path: PathBuf;
 
         if output_path.is_dir() {
-            debug_println!("Output path is directory");
             output_file_path = output_path.join(format!("{}.{}", file_name, target_image_format));
-            debug_println!("Output path: {}", output_file_path.to_string_lossy());
         } else {
-            debug_println!("Output path is not directory. Creating a new directory...");
             output_file_path = output_path.join(format!("/{}.{}", file_name, target_image_format));
-            debug_println!("Output path: {}", output_file_path.to_string_lossy());
         }
-
-        debug_println!("Desqueezing {}...", file_name);
 
         let image = image::open(image_path)?;
         let (width, height) = image.dimensions();
@@ -96,12 +84,9 @@ pub mod processor {
             width *= squeeze_factor.value();
         } else if height > width {
             height *= squeeze_factor.value();
-        } else {
-            debug_println!("Do not desqueeze square images");
         }
 
         let path_ref = output_file_path.as_path();
-        debug_println!("{}", path_ref.to_string_lossy());
         let new_image = image.resize_exact(width as u32, height as u32, FilterType::Nearest);
         new_image.save(path_ref)?;
         return Ok(path_ref.to_string_lossy().to_string());

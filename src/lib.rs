@@ -14,11 +14,6 @@
    limitations under the License.
 */
 
-#[cfg(debug_assertions)]
-macro_rules! debug_println {
-    ($($args:tt)*) => { println!($($args)*) };
-}
-
 pub mod processor;
 use image::{ImageError, ImageFormat};
 use processor::processor::{desqueeze_image, SqueezeFactor};
