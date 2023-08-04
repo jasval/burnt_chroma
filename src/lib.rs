@@ -15,20 +15,9 @@
 */
 
 pub mod processor;
-use image::{ImageError as ImagePackageImageError, ImageFormat as ImagePackageImageFormat};
+use image::ImageFormat as ImagePackageImageFormat;
 use processor::processor::desqueeze_image;
-use swift_ffi::{ImageError, ImageFormat};
-
-impl ImageError {
-    pub fn new(image_error: ImagePackageImageError) -> ImageError {
-        match image_error {
-            ImagePackageImageError::IoError(_) => ImageError::IoError,
-            ImagePackageImageError::Decoding(_) => ImageError::DecodingError,
-            ImagePackageImageError::Encoding(_) => ImageError::EncodingError,
-            _ => ImageError::UnspecifiedError,
-        }
-    }
-}
+use swift_ffi::ImageFormat;
 
 impl ImageFormat {
     pub fn new(image_format: ImagePackageImageFormat) -> ImageFormat {
@@ -87,13 +76,6 @@ mod swift_ffi {
         X2,
     }
 
-    pub enum ImageError {
-        IoError,
-        DecodingError,
-        EncodingError,
-        UnspecifiedError,
-    }
-
     pub enum ImageFormat {
         Png,
         Jpeg,
@@ -120,6 +102,6 @@ mod swift_ffi {
             output_path: &str,
             image_format: Option<ImageFormat>,
             squeeze_factor: ImageSqueezeFactor,
-        ) -> Result<String, ImageError>;
+        ) -> Result<String, String>;
     }
 }
