@@ -1,12 +1,8 @@
 import RustXcframework
 public func desqueeze_image<GenericToRustStr: ToRustStr>(_ image_path: GenericToRustStr, _ output_path: GenericToRustStr, _ image_format: Optional<ImageFormat>, _ squeeze_factor: ImageSqueezeFactor) async throws -> RustString {
-    func onComplete(cbWrapperPtr: UnsafeMutableRawPointer?, rustFnRetVal: __private__ResultPtrAndPtr) {
+    func onComplete(cbWrapperPtr: UnsafeMutableRawPointer?, rustFnRetVal: __swift_bridge__$ResultStringAndImageError) {
         let wrapper = Unmanaged<CbWrapper$desqueeze_image>.fromOpaque(cbWrapperPtr!).takeRetainedValue()
-        if rustFnRetVal.is_ok {
-            wrapper.cb(.success(RustString(ptr: rustFnRetVal.ok_or_err!)))
-        } else {
-            wrapper.cb(.failure(RustString(ptr: rustFnRetVal.ok_or_err!)))
-        }
+        switch rustFnRetVal.tag { case __swift_bridge__$ResultStringAndImageError$ResultOk: wrapper.cb(.success(RustString(ptr: rustFnRetVal.payload.ok))) case __swift_bridge__$ResultStringAndImageError$ResultErr: wrapper.cb(.failure(rustFnRetVal.payload.err.intoSwiftRepr())) default: fatalError() }
     }
 
     return try await withCheckedThrowingContinuation({ (continuation: CheckedContinuation<RustString, Error>) in
@@ -119,6 +115,96 @@ extension ImageSqueezeFactor: Vectorizable {
 
     public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
         __swift_bridge__$Vec_ImageSqueezeFactor$len(vecPtr)
+    }
+}
+public enum ImageError {
+    case IoError
+    case DecodingError
+    case EncodingError
+    case UnspecifiedError
+}
+extension ImageError {
+    func intoFfiRepr() -> __swift_bridge__$ImageError {
+        switch self {
+            case ImageError.IoError:
+                return __swift_bridge__$ImageError(tag: __swift_bridge__$ImageError$IoError)
+            case ImageError.DecodingError:
+                return __swift_bridge__$ImageError(tag: __swift_bridge__$ImageError$DecodingError)
+            case ImageError.EncodingError:
+                return __swift_bridge__$ImageError(tag: __swift_bridge__$ImageError$EncodingError)
+            case ImageError.UnspecifiedError:
+                return __swift_bridge__$ImageError(tag: __swift_bridge__$ImageError$UnspecifiedError)
+        }
+    }
+}
+extension __swift_bridge__$ImageError {
+    func intoSwiftRepr() -> ImageError {
+        switch self.tag {
+            case __swift_bridge__$ImageError$IoError:
+                return ImageError.IoError
+            case __swift_bridge__$ImageError$DecodingError:
+                return ImageError.DecodingError
+            case __swift_bridge__$ImageError$EncodingError:
+                return ImageError.EncodingError
+            case __swift_bridge__$ImageError$UnspecifiedError:
+                return ImageError.UnspecifiedError
+            default:
+                fatalError("Unreachable")
+        }
+    }
+}
+extension __swift_bridge__$Option$ImageError {
+    @inline(__always)
+    func intoSwiftRepr() -> Optional<ImageError> {
+        if self.is_some {
+            return self.val.intoSwiftRepr()
+        } else {
+            return nil
+        }
+    }
+    @inline(__always)
+    static func fromSwiftRepr(_ val: Optional<ImageError>) -> __swift_bridge__$Option$ImageError {
+        if let v = val {
+            return __swift_bridge__$Option$ImageError(is_some: true, val: v.intoFfiRepr())
+        } else {
+            return __swift_bridge__$Option$ImageError(is_some: false, val: __swift_bridge__$ImageError())
+        }
+    }
+}
+extension ImageError: Vectorizable {
+    public static func vecOfSelfNew() -> UnsafeMutableRawPointer {
+        __swift_bridge__$Vec_ImageError$new()
+    }
+
+    public static func vecOfSelfFree(vecPtr: UnsafeMutableRawPointer) {
+        __swift_bridge__$Vec_ImageError$drop(vecPtr)
+    }
+
+    public static func vecOfSelfPush(vecPtr: UnsafeMutableRawPointer, value: Self) {
+        __swift_bridge__$Vec_ImageError$push(vecPtr, value.intoFfiRepr())
+    }
+
+    public static func vecOfSelfPop(vecPtr: UnsafeMutableRawPointer) -> Optional<Self> {
+        let maybeEnum = __swift_bridge__$Vec_ImageError$pop(vecPtr)
+        return maybeEnum.intoSwiftRepr()
+    }
+
+    public static func vecOfSelfGet(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<Self> {
+        let maybeEnum = __swift_bridge__$Vec_ImageError$get(vecPtr, index)
+        return maybeEnum.intoSwiftRepr()
+    }
+
+    public static func vecOfSelfGetMut(vecPtr: UnsafeMutableRawPointer, index: UInt) -> Optional<Self> {
+        let maybeEnum = __swift_bridge__$Vec_ImageError$get_mut(vecPtr, index)
+        return maybeEnum.intoSwiftRepr()
+    }
+
+    public static func vecOfSelfAsPtr(vecPtr: UnsafeMutableRawPointer) -> UnsafePointer<Self> {
+        UnsafePointer<Self>(OpaquePointer(__swift_bridge__$Vec_ImageError$as_ptr(vecPtr)))
+    }
+
+    public static func vecOfSelfLen(vecPtr: UnsafeMutableRawPointer) -> UInt {
+        __swift_bridge__$Vec_ImageError$len(vecPtr)
     }
 }
 public enum ImageFormat {

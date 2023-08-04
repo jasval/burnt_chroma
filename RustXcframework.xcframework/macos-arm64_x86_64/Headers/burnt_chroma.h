@@ -13,6 +13,19 @@ __swift_bridge__$Option$ImageSqueezeFactor __swift_bridge__$Vec_ImageSqueezeFact
 uintptr_t __swift_bridge__$Vec_ImageSqueezeFactor$len(void* vec_ptr);
 void* __swift_bridge__$Vec_ImageSqueezeFactor$as_ptr(void* vec_ptr);
 
+typedef enum __swift_bridge__$ImageErrorTag { __swift_bridge__$ImageError$IoError, __swift_bridge__$ImageError$DecodingError, __swift_bridge__$ImageError$EncodingError, __swift_bridge__$ImageError$UnspecifiedError, } __swift_bridge__$ImageErrorTag;
+typedef struct __swift_bridge__$ImageError { __swift_bridge__$ImageErrorTag tag; } __swift_bridge__$ImageError;
+typedef struct __swift_bridge__$Option$ImageError { bool is_some; __swift_bridge__$ImageError val; } __swift_bridge__$Option$ImageError;
+
+void* __swift_bridge__$Vec_ImageError$new(void);
+void __swift_bridge__$Vec_ImageError$drop(void* vec_ptr);
+void __swift_bridge__$Vec_ImageError$push(void* vec_ptr, __swift_bridge__$ImageError item);
+__swift_bridge__$Option$ImageError __swift_bridge__$Vec_ImageError$pop(void* vec_ptr);
+__swift_bridge__$Option$ImageError __swift_bridge__$Vec_ImageError$get(void* vec_ptr, uintptr_t index);
+__swift_bridge__$Option$ImageError __swift_bridge__$Vec_ImageError$get_mut(void* vec_ptr, uintptr_t index);
+uintptr_t __swift_bridge__$Vec_ImageError$len(void* vec_ptr);
+void* __swift_bridge__$Vec_ImageError$as_ptr(void* vec_ptr);
+
 typedef enum __swift_bridge__$ImageFormatTag { __swift_bridge__$ImageFormat$Png, __swift_bridge__$ImageFormat$Jpeg, __swift_bridge__$ImageFormat$Gif, __swift_bridge__$ImageFormat$WebP, __swift_bridge__$ImageFormat$Pnm, __swift_bridge__$ImageFormat$Tiff, __swift_bridge__$ImageFormat$Tga, __swift_bridge__$ImageFormat$Dds, __swift_bridge__$ImageFormat$Bmp, __swift_bridge__$ImageFormat$Ico, __swift_bridge__$ImageFormat$Hdr, __swift_bridge__$ImageFormat$OpenExr, __swift_bridge__$ImageFormat$Farbfeld, __swift_bridge__$ImageFormat$Avif, __swift_bridge__$ImageFormat$Qoi, __swift_bridge__$ImageFormat$Heic, __swift_bridge__$ImageFormat$NotSupported, } __swift_bridge__$ImageFormatTag;
 typedef struct __swift_bridge__$ImageFormat { __swift_bridge__$ImageFormatTag tag; } __swift_bridge__$ImageFormat;
 typedef struct __swift_bridge__$Option$ImageFormat { bool is_some; __swift_bridge__$ImageFormat val; } __swift_bridge__$Option$ImageFormat;
@@ -26,6 +39,9 @@ __swift_bridge__$Option$ImageFormat __swift_bridge__$Vec_ImageFormat$get_mut(voi
 uintptr_t __swift_bridge__$Vec_ImageFormat$len(void* vec_ptr);
 void* __swift_bridge__$Vec_ImageFormat$as_ptr(void* vec_ptr);
 
-void __swift_bridge__$desqueeze_image(void* callback_wrapper, void __swift_bridge__$desqueeze_image$async(void* callback_wrapper, struct __private__ResultPtrAndPtr ret), struct RustStr image_path, struct RustStr output_path, struct __swift_bridge__$Option$ImageFormat image_format, struct __swift_bridge__$ImageSqueezeFactor squeeze_factor);
+void __swift_bridge__$desqueeze_image(void* callback_wrapper, void __swift_bridge__$desqueeze_image$async(void* callback_wrapper, struct __swift_bridge__$ResultStringAndImageError ret), struct RustStr image_path, struct RustStr output_path, struct __swift_bridge__$Option$ImageFormat image_format, struct __swift_bridge__$ImageSqueezeFactor squeeze_factor);
+typedef enum __swift_bridge__$ResultStringAndImageError$Tag {__swift_bridge__$ResultStringAndImageError$ResultOk, __swift_bridge__$ResultStringAndImageError$ResultErr} __swift_bridge__$ResultStringAndImageError$Tag;
+union __swift_bridge__$ResultStringAndImageError$Fields {void* ok; struct __swift_bridge__$ImageError err;};
+typedef struct __swift_bridge__$ResultStringAndImageError{__swift_bridge__$ResultStringAndImageError$Tag tag; union __swift_bridge__$ResultStringAndImageError$Fields payload;} __swift_bridge__$ResultStringAndImageError;
 
 

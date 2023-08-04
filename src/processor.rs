@@ -17,7 +17,7 @@
 mod internal;
 pub mod processor {
     use super::internal::*;
-    use crate::swift_ffi::{ImageFormat, ImageSqueezeFactor};
+    use crate::swift_ffi::{ImageError, ImageFormat, ImageSqueezeFactor};
     use image::ImageFormat as ImagePackageImageFormat;
     pub enum SqueezeFactor {
         X1_33,
@@ -51,7 +51,7 @@ pub mod processor {
         output_path: &str,
         image_format: Option<ImageFormat>,
         squeeze_factor: ImageSqueezeFactor,
-    ) -> Result<String, String> {
+    ) -> Result<String, ImageError> {
         let unwrapped_image_format: Option<ImagePackageImageFormat> = {
             if let Some(image_format) = image_format {
                 image_format.to_image_format()
@@ -67,7 +67,7 @@ pub mod processor {
             unwrapped_squeeze_factor,
         )
         .await
-        .map_err(|error| error.to_string());
+        .map_err(|error| ImageError::new(error));
     }
 }
 #[cfg(test)]
