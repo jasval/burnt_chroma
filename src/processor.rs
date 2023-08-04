@@ -14,10 +14,11 @@
    limitations under the License.
 */
 
+mod internal;
 pub mod processor {
-    use image::{imageops::FilterType, GenericImageView, ImageError, ImageFormat};
-    use std::path::{Path, PathBuf};
-
+    use super::internal::*;
+    use crate::swift_ffi::{ImageError, ImageFormat, ImageSqueezeFactor};
+    use image::ImageFormat as ImagePackageImageFormat;
     pub enum SqueezeFactor {
         X1_33,
         X1_5,
@@ -26,12 +27,21 @@ pub mod processor {
     }
 
     impl SqueezeFactor {
-        fn value(&self) -> f32 {
+        pub fn value(&self) -> f32 {
             match *self {
                 SqueezeFactor::X1_33 => 1.33,
                 SqueezeFactor::X1_5 => 1.5,
                 SqueezeFactor::X1_75 => 1.75,
                 SqueezeFactor::X2 => 2.0,
+            }
+        }
+
+        pub fn from_swift(squeeze_factor: ImageSqueezeFactor) -> SqueezeFactor {
+            match squeeze_factor {
+                ImageSqueezeFactor::X1_33 => SqueezeFactor::X1_33,
+                ImageSqueezeFactor::X1_5 => SqueezeFactor::X1_5,
+                ImageSqueezeFactor::X1_75 => SqueezeFactor::X1_75,
+                ImageSqueezeFactor::X2 => SqueezeFactor::X2,
             }
         }
     }
@@ -40,69 +50,37 @@ pub mod processor {
         image_path: &str,
         output_path: &str,
         image_format: Option<ImageFormat>,
-        squeeze_factor: SqueezeFactor,
+        squeeze_factor: ImageSqueezeFactor,
     ) -> Result<String, ImageError> {
-        let image_path = Path::new(image_path);
-
-        let target_image_format = image_format
-            .unwrap_or_else(|| {
-                image::ImageFormat::from_path(image_path).unwrap_or(ImageFormat::Png)
-            })
-            .extensions_str()
-            .first()
-            .unwrap_or(&"png")
-            .to_string();
-
-        let file_name = image_path
-            .file_stem()
-            .unwrap_or_else(|| image_path.as_os_str())
-            .to_str()
-            .unwrap_or("")
-            .to_string();
-
-        let output_path = Path::new(output_path);
-
-        if !output_path.try_exists()? {
-            std::fs::create_dir(output_path)?;
-        }
-
-        let output_file_path: PathBuf;
-
-        if output_path.is_dir() {
-            output_file_path = output_path.join(format!("{}.{}", file_name, target_image_format));
-        } else {
-            output_file_path = output_path.join(format!("/{}.{}", file_name, target_image_format));
-        }
-
-        let image = image::open(image_path)?;
-        let (width, height) = image.dimensions();
-
-        let mut width = width as f32;
-        let mut height = height as f32;
-
-        if width > height {
-            width *= squeeze_factor.value();
-        } else if height > width {
-            height *= squeeze_factor.value();
-        }
-
-        let path_ref = output_file_path.as_path();
-        let new_image = image.resize_exact(width as u32, height as u32, FilterType::Nearest);
-        new_image.save(path_ref)?;
-        return Ok(path_ref.to_string_lossy().to_string());
+        let unwrapped_image_format: Option<ImagePackageImageFormat> = {
+            if let Some(image_format) = image_format {
+                image_format.to_image_format()
+            } else {
+                None
+            }
+        };
+        let unwrapped_squeeze_factor = SqueezeFactor::from_swift(squeeze_factor);
+        return desqueeze_image_internal(
+            image_path,
+            output_path,
+            unwrapped_image_format,
+            unwrapped_squeeze_factor,
+        )
+        .await
+        .map_err(|error| ImageError::new(error));
     }
 }
-
 #[cfg(test)]
 mod processor_tests {
-    use crate::processor::processor;
+    use crate::processor::processor::desqueeze_image;
+    use crate::swift_ffi::ImageSqueezeFactor;
     #[tokio::test]
     async fn should_desqueeze_landscape_image() {
-        let result = processor::desqueeze_image(
+        let result = desqueeze_image(
             "src/tests/squeezedLandscape.jpeg",
             "src/tests/output/",
             None,
-            processor::SqueezeFactor::X1_33,
+            ImageSqueezeFactor::X1_33,
         );
 
         assert_eq!(result.await.is_ok(), true);
@@ -114,11 +92,11 @@ mod processor_tests {
 
     #[tokio::test]
     async fn should_desqueeze_portrait_image() {
-        let result = processor::desqueeze_image(
+        let result = desqueeze_image(
             "src/tests/squeezedPortrait.jpeg",
             "src/tests/output/",
             None,
-            processor::SqueezeFactor::X1_33,
+            ImageSqueezeFactor::X1_33,
         );
         assert_eq!(result.await.is_ok(), true);
         std::fs::remove_file("src/tests/output/squeezedPortrait.jpg").unwrap_or_else(|error| {
