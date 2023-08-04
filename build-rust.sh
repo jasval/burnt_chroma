@@ -30,7 +30,7 @@ lipo \
 
  swift-bridge-cli create-package \
   --bridges-dir ./generated \
-  --out-dir SwiftBurntChroma \
+  --out-dir . \
   --ios target/aarch64-apple-ios/release/libburnt_chroma.a \
   --simulator target/universal-ios/release/libburnt_chroma.a \
   --macos target/universal-macos/release/libburnt_chroma.a \
