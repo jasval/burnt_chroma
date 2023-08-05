@@ -15,7 +15,12 @@
 */
 
 pub mod processor;
-uniffi::include_scaffolding!("math");
+uniffi::include_scaffolding!("lib");
+
+// Test to implement a function that adds two numbers
+fn add() -> u32 {
+    return 0;
+}
 
 pub mod swift_ffi {
     use image::ImageFormat as CrateImageFormat;
@@ -67,11 +72,6 @@ pub mod swift_ffi {
     pub fn get_optional_image_format(image_format: ImageFormat) -> Option<CrateImageFormat> {
         image_format.into()
     }
-}
-
-// Test to implement a function that adds two numbers
-fn add(a: u32, b: u32) -> u32 {
-    a + b
 }
 
 #[cfg(test)]

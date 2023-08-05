@@ -16,5 +16,5 @@
 
 fn main() {
     // Create scaffolding for Swift FFI
-    uniffi::generate_scaffolding("src/math.udl").unwrap();
+    uniffi::generate_scaffolding("src/lib.udl").unwrap();
 }
