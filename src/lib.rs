@@ -15,111 +15,63 @@
 */
 
 pub mod processor;
-use image::{ImageError as ImagePackageImageError, ImageFormat as ImagePackageImageFormat};
-use processor::processor::desqueeze_image;
-use swift_ffi::{ImageError, ImageFormat};
+pub mod swift_ffi {
+    use image::ImageFormat;
+    use image_objects::proto_image_format::FormatType;
+    use image_objects::ProtoImageFormat;
 
-impl ImageError {
-    pub fn new(image_error: ImagePackageImageError) -> ImageError {
-        match image_error {
-            ImagePackageImageError::IoError(_) => ImageError::IoError,
-            ImagePackageImageError::Decoding(_) => ImageError::DecodingError,
-            ImagePackageImageError::Encoding(_) => ImageError::EncodingError,
-            _ => ImageError::UnspecifiedError,
+    pub mod image_objects {
+        include!(concat!(env!("OUT_DIR"), "/swift_ffi.image_objects.rs"));
+    }
+
+    impl From<ProtoImageFormat> for Option<ImageFormat> {
+        fn from(proto_image_format: ProtoImageFormat) -> Self {
+            match FormatType::from_i32(proto_image_format.kind) {
+                Some(FormatType::Avif) => Some(ImageFormat::Avif),
+                Some(FormatType::Bmp) => Some(ImageFormat::Bmp),
+                Some(FormatType::Gif) => Some(ImageFormat::Gif),
+                Some(FormatType::Ico) => Some(ImageFormat::Ico),
+                Some(FormatType::Jpeg) => Some(ImageFormat::Jpeg),
+                Some(FormatType::Png) => Some(ImageFormat::Png),
+                Some(FormatType::Pnm) => Some(ImageFormat::Pnm),
+                Some(FormatType::Tiff) => Some(ImageFormat::Tiff),
+                Some(FormatType::WebP) => Some(ImageFormat::WebP),
+                Some(FormatType::Tga) => Some(ImageFormat::Tga),
+                Some(FormatType::Dds) => Some(ImageFormat::Dds),
+                Some(FormatType::Farbfeld) => Some(ImageFormat::Farbfeld),
+                Some(FormatType::Hdr) => Some(ImageFormat::Hdr),
+                Some(FormatType::OpenExr) => Some(ImageFormat::OpenExr),
+                Some(FormatType::Qoi) => Some(ImageFormat::Qoi),
+                Some(FormatType::Heif) => None,
+                Some(FormatType::Heic) => None,
+                _ => None,
+            }
         }
+    }
+
+    pub fn get_optional_image_format(value: i32) -> Option<ImageFormat> {
+        let mut image_format = ProtoImageFormat::default();
+        image_format.kind = value;
+        return image_format.into();
     }
 }
 
-impl ImageFormat {
-    pub fn new(image_format: ImagePackageImageFormat) -> ImageFormat {
-        match image_format {
-            ImagePackageImageFormat::Avif => ImageFormat::Avif,
-            ImagePackageImageFormat::Bmp => ImageFormat::Bmp,
-            ImagePackageImageFormat::Gif => ImageFormat::Gif,
-            ImagePackageImageFormat::Ico => ImageFormat::Ico,
-            ImagePackageImageFormat::Jpeg => ImageFormat::Jpeg,
-            ImagePackageImageFormat::Png => ImageFormat::Png,
-            ImagePackageImageFormat::Pnm => ImageFormat::Pnm,
-            ImagePackageImageFormat::Tiff => ImageFormat::Tiff,
-            ImagePackageImageFormat::WebP => ImageFormat::WebP,
-            ImagePackageImageFormat::Tga => ImageFormat::Tga,
-            ImagePackageImageFormat::Dds => ImageFormat::Dds,
-            ImagePackageImageFormat::Farbfeld => ImageFormat::Farbfeld,
-            ImagePackageImageFormat::Hdr => ImageFormat::Hdr,
-            ImagePackageImageFormat::OpenExr => ImageFormat::OpenExr,
-            ImagePackageImageFormat::Qoi => ImageFormat::Qoi,
-            _ => ImageFormat::NotSupported,
-        }
-    }
-
-    fn to_image_format(&self) -> Option<ImagePackageImageFormat> {
-        match &self {
-            Self::Avif => Some(ImagePackageImageFormat::Avif),
-            Self::Bmp => Some(ImagePackageImageFormat::Bmp),
-            Self::Gif => Some(ImagePackageImageFormat::Gif),
-            Self::Ico => Some(ImagePackageImageFormat::Ico),
-            Self::Jpeg => Some(ImagePackageImageFormat::Jpeg),
-            Self::Png => Some(ImagePackageImageFormat::Png),
-            Self::Pnm => Some(ImagePackageImageFormat::Pnm),
-            Self::Tiff => Some(ImagePackageImageFormat::Tiff),
-            Self::WebP => Some(ImagePackageImageFormat::WebP),
-            Self::Tga => Some(ImagePackageImageFormat::Tga),
-            Self::Dds => Some(ImagePackageImageFormat::Dds),
-            Self::Farbfeld => Some(ImagePackageImageFormat::Farbfeld),
-            Self::Hdr => Some(ImagePackageImageFormat::Hdr),
-            Self::OpenExr => Some(ImagePackageImageFormat::OpenExr),
-            Self::Qoi => Some(ImagePackageImageFormat::Qoi),
-            _ => None,
-        }
-    }
+// Test to implement a function that adds two numbers
+fn add(a: u32, b: u32) -> u32 {
+    a + b
 }
 
-// We can use the `swift_bridge` macro to generate the Swift FFI for us.
-// Then at build time the `swift_bridge-build` crate is used to generate
-// the corresponding Swift and C FFI glue code.
-#[swift_bridge::bridge]
-mod swift_ffi {
+#[cfg(test)]
+mod swift_ffi_tests {
+    use super::swift_ffi::get_optional_image_format;
 
-    enum ImageSqueezeFactor {
-        X1_33,
-        X1_5,
-        X1_75,
-        X2,
+    #[test]
+    fn should_return_valid_format() {
+        assert_ne!(get_optional_image_format(3), None);
     }
 
-    pub enum ImageError {
-        IoError,
-        DecodingError,
-        EncodingError,
-        UnspecifiedError,
-    }
-
-    pub enum ImageFormat {
-        Png,
-        Jpeg,
-        Gif,
-        WebP,
-        Pnm,
-        Tiff,
-        Tga,
-        Dds,
-        Bmp,
-        Ico,
-        Hdr,
-        OpenExr,
-        Farbfeld,
-        Avif,
-        Qoi,
-        Heic,
-        NotSupported,
-    }
-
-    extern "Rust" {
-        async fn desqueeze_image(
-            image_path: &str,
-            output_path: &str,
-            image_format: Option<ImageFormat>,
-            squeeze_factor: ImageSqueezeFactor,
-        ) -> Result<String, ImageError>;
+    #[test]
+    fn should_return_empty() {
+        assert_eq!(get_optional_image_format(100), None);
     }
 }

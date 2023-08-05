@@ -13,12 +13,9 @@ exclude = ["src/tests"]
 
 [lib]
 name= "burnt_chroma"
-crate-type = ["staticlib"]
+crate-type = ["staticlib", "cdylib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[profile.dev]
-debug = true
 
 [profile.release]
 debug = false
@@ -29,12 +26,13 @@ panic = 'abort'     # Abort on panic
 strip = true        # Strip symbols from binary*
 
 [build-dependencies]
-swift-bridge-build = "0.1"
-
+prost-build = "0.11.9"
+ffi-support = { version = "0.4.4", features = ["build"] }
 [dependencies]
 image = "0.24.6"
-tokio = { version = "1.29.1", features = ["macros"] }
-swift-bridge = { version = "0.1.52", features = ["async"] }
+tokio = { version = "1.29.1", features = ["full"] }
+ffi-support = "0.4.4"
+prost = "0.11.9"
 
 [dev-dependencies]
 
