@@ -26,12 +26,12 @@ panic = 'abort'     # Abort on panic
 strip = true        # Strip symbols from binary*
 
 [build-dependencies]
-prost-build = "0.11.9"
-ffi-support = { version = "0.4.4", features = ["build"] }
+uniffi = { version = "0.24.3", features = ["build"] }
+
 [dependencies]
 image = "0.24.6"
 tokio = { version = "1.29.1", features = ["full"] }
-ffi-support = "0.4.4"
+uniffi = "0.24.3"
 prost = "0.11.9"
 
 [dev-dependencies]

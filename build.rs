@@ -15,9 +15,6 @@
 */
 
 fn main() {
-    // Create protocol buffers
-    prost_build::compile_protos(&["src/image_format.proto"], &["src/"]).unwrap();
-
     // Create scaffolding for Swift FFI
     uniffi::generate_scaffolding("src/math.udl").unwrap();
 }

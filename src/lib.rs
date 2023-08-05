@@ -15,44 +15,57 @@
 */
 
 pub mod processor;
-pub mod swift_ffi {
-    use image::ImageFormat;
-    use image_objects::proto_image_format::FormatType;
-    use image_objects::ProtoImageFormat;
+uniffi::include_scaffolding!("math");
 
-    pub mod image_objects {
-        include!(concat!(env!("OUT_DIR"), "/swift_ffi.image_objects.rs"));
+pub mod swift_ffi {
+    use image::ImageFormat as CrateImageFormat;
+
+    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
+    pub enum ImageFormat {
+        Avif,
+        Bmp,
+        Gif,
+        Ico,
+        Jpeg,
+        Png,
+        Pnm,
+        Tiff,
+        WebP,
+        Tga,
+        Dds,
+        Farbfeld,
+        Hdr,
+        OpenExr,
+        Qoi,
+        Heif,
+        Heic,
     }
 
-    impl From<ProtoImageFormat> for Option<ImageFormat> {
-        fn from(proto_image_format: ProtoImageFormat) -> Self {
-            match FormatType::from_i32(proto_image_format.kind) {
-                Some(FormatType::Avif) => Some(ImageFormat::Avif),
-                Some(FormatType::Bmp) => Some(ImageFormat::Bmp),
-                Some(FormatType::Gif) => Some(ImageFormat::Gif),
-                Some(FormatType::Ico) => Some(ImageFormat::Ico),
-                Some(FormatType::Jpeg) => Some(ImageFormat::Jpeg),
-                Some(FormatType::Png) => Some(ImageFormat::Png),
-                Some(FormatType::Pnm) => Some(ImageFormat::Pnm),
-                Some(FormatType::Tiff) => Some(ImageFormat::Tiff),
-                Some(FormatType::WebP) => Some(ImageFormat::WebP),
-                Some(FormatType::Tga) => Some(ImageFormat::Tga),
-                Some(FormatType::Dds) => Some(ImageFormat::Dds),
-                Some(FormatType::Farbfeld) => Some(ImageFormat::Farbfeld),
-                Some(FormatType::Hdr) => Some(ImageFormat::Hdr),
-                Some(FormatType::OpenExr) => Some(ImageFormat::OpenExr),
-                Some(FormatType::Qoi) => Some(ImageFormat::Qoi),
-                Some(FormatType::Heif) => None,
-                Some(FormatType::Heic) => None,
-                _ => None,
+    impl From<ImageFormat> for Option<CrateImageFormat> {
+        fn from(image_format: ImageFormat) -> Self {
+            match image_format {
+                ImageFormat::Avif => Some(CrateImageFormat::Avif),
+                ImageFormat::Bmp => Some(CrateImageFormat::Bmp),
+                ImageFormat::Gif => Some(CrateImageFormat::Gif),
+                ImageFormat::Ico => Some(CrateImageFormat::Ico),
+                ImageFormat::Jpeg => Some(CrateImageFormat::Jpeg),
+                ImageFormat::Png => Some(CrateImageFormat::Png),
+                ImageFormat::Pnm => Some(CrateImageFormat::Pnm),
+                ImageFormat::Tiff => Some(CrateImageFormat::Tiff),
+                ImageFormat::WebP => Some(CrateImageFormat::WebP),
+                ImageFormat::Tga => Some(CrateImageFormat::Tga),
+                ImageFormat::Dds => Some(CrateImageFormat::Dds),
+                ImageFormat::Farbfeld => Some(CrateImageFormat::Farbfeld),
+                ImageFormat::Hdr => Some(CrateImageFormat::Hdr),
+                ImageFormat::OpenExr => Some(CrateImageFormat::OpenExr),
+                ImageFormat::Qoi => Some(CrateImageFormat::Qoi),
+                ImageFormat::Heif | ImageFormat::Heic => None,
             }
         }
     }
 
-    pub fn get_optional_image_format(value: i32) -> Option<ImageFormat> {
-        let mut image_format = ProtoImageFormat::default();
-        image_format.kind = value;
-        return image_format.into();
+    pub fn get_optional_image_format(image_format: ImageFormat) -> Option<CrateImageFormat> {
+        image_format.into()
     }
 }
 
@@ -63,15 +76,15 @@ fn add(a: u32, b: u32) -> u32 {
 
 #[cfg(test)]
 mod swift_ffi_tests {
-    use super::swift_ffi::get_optional_image_format;
+    use super::swift_ffi::{get_optional_image_format, ImageFormat};
 
     #[test]
     fn should_return_valid_format() {
-        assert_ne!(get_optional_image_format(3), None);
+        assert_ne!(get_optional_image_format(ImageFormat::Avif), None);
     }
 
     #[test]
     fn should_return_empty() {
-        assert_eq!(get_optional_image_format(100), None);
+        assert_eq!(get_optional_image_format(ImageFormat::Heic), None)
     }
 }
