@@ -1,8 +1,7 @@
 // Module: processor/internal.rs
 use image::{imageops::FilterType, GenericImageView, ImageError, ImageFormat};
 use std::path::{Path, PathBuf};
-
-use super::processor::SqueezeFactor;
+use super::SqueezeFactor;
 
 pub async fn desqueeze_image_internal(
     image_path: &str,

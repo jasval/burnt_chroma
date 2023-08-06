@@ -13,12 +13,12 @@ exclude = ["src/tests"]
 
 [lib]
 name= "burnt_chroma"
-crate-type = ["staticlib"]
+crate-type = ["cdylib", "staticlib"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[profile.dev]
-debug = true
+[[bin]]
+# This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
+name = "uniffi-bindgen"
+path = "uniffi-bindgen.rs"
 
 [profile.release]
 debug = false
@@ -29,14 +29,21 @@ panic = 'abort'     # Abort on panic
 strip = true        # Strip symbols from binary*
 
 [build-dependencies]
-swift-bridge-build = "0.1"
+uniffi = { version = "0.24.3", features = ["build"] }
 
 [dependencies]
 image = "0.24.6"
-tokio = { version = "1.29.1", features = ["macros"] }
-swift-bridge = { version = "0.1.52", features = ["async"] }
+tokio = { version = "1.29.1", features = ["full"] }
+uniffi = { version = "0.24.3", features = ["cli"] }
+prost = "0.11.9"
 
 [dev-dependencies]
 
 [features]
 debug_assertions = []
+
+
+[package.metadata.swiftpackage]
+name = "BurntChroma"
+platforms = ["ios", "macos"]
+version = "0.1.0"

@@ -15,111 +15,76 @@
 */
 
 pub mod processor;
-use image::{ImageError as ImagePackageImageError, ImageFormat as ImagePackageImageFormat};
-use processor::processor::desqueeze_image;
-use swift_ffi::{ImageError, ImageFormat};
+uniffi::include_scaffolding!("lib");
 
-impl ImageError {
-    pub fn new(image_error: ImagePackageImageError) -> ImageError {
-        match image_error {
-            ImagePackageImageError::IoError(_) => ImageError::IoError,
-            ImagePackageImageError::Decoding(_) => ImageError::DecodingError,
-            ImagePackageImageError::Encoding(_) => ImageError::EncodingError,
-            _ => ImageError::UnspecifiedError,
-        }
-    }
+// Test to implement a function that adds two numbers
+fn add() -> u32 {
+    return 0;
 }
 
-impl ImageFormat {
-    pub fn new(image_format: ImagePackageImageFormat) -> ImageFormat {
-        match image_format {
-            ImagePackageImageFormat::Avif => ImageFormat::Avif,
-            ImagePackageImageFormat::Bmp => ImageFormat::Bmp,
-            ImagePackageImageFormat::Gif => ImageFormat::Gif,
-            ImagePackageImageFormat::Ico => ImageFormat::Ico,
-            ImagePackageImageFormat::Jpeg => ImageFormat::Jpeg,
-            ImagePackageImageFormat::Png => ImageFormat::Png,
-            ImagePackageImageFormat::Pnm => ImageFormat::Pnm,
-            ImagePackageImageFormat::Tiff => ImageFormat::Tiff,
-            ImagePackageImageFormat::WebP => ImageFormat::WebP,
-            ImagePackageImageFormat::Tga => ImageFormat::Tga,
-            ImagePackageImageFormat::Dds => ImageFormat::Dds,
-            ImagePackageImageFormat::Farbfeld => ImageFormat::Farbfeld,
-            ImagePackageImageFormat::Hdr => ImageFormat::Hdr,
-            ImagePackageImageFormat::OpenExr => ImageFormat::OpenExr,
-            ImagePackageImageFormat::Qoi => ImageFormat::Qoi,
-            _ => ImageFormat::NotSupported,
-        }
-    }
+pub mod swift_ffi {
+    use image::ImageFormat as CrateImageFormat;
 
-    fn to_image_format(&self) -> Option<ImagePackageImageFormat> {
-        match &self {
-            Self::Avif => Some(ImagePackageImageFormat::Avif),
-            Self::Bmp => Some(ImagePackageImageFormat::Bmp),
-            Self::Gif => Some(ImagePackageImageFormat::Gif),
-            Self::Ico => Some(ImagePackageImageFormat::Ico),
-            Self::Jpeg => Some(ImagePackageImageFormat::Jpeg),
-            Self::Png => Some(ImagePackageImageFormat::Png),
-            Self::Pnm => Some(ImagePackageImageFormat::Pnm),
-            Self::Tiff => Some(ImagePackageImageFormat::Tiff),
-            Self::WebP => Some(ImagePackageImageFormat::WebP),
-            Self::Tga => Some(ImagePackageImageFormat::Tga),
-            Self::Dds => Some(ImagePackageImageFormat::Dds),
-            Self::Farbfeld => Some(ImagePackageImageFormat::Farbfeld),
-            Self::Hdr => Some(ImagePackageImageFormat::Hdr),
-            Self::OpenExr => Some(ImagePackageImageFormat::OpenExr),
-            Self::Qoi => Some(ImagePackageImageFormat::Qoi),
-            _ => None,
-        }
-    }
-}
-
-// We can use the `swift_bridge` macro to generate the Swift FFI for us.
-// Then at build time the `swift_bridge-build` crate is used to generate
-// the corresponding Swift and C FFI glue code.
-#[swift_bridge::bridge]
-mod swift_ffi {
-
-    enum ImageSqueezeFactor {
-        X1_33,
-        X1_5,
-        X1_75,
-        X2,
-    }
-
-    pub enum ImageError {
-        IoError,
-        DecodingError,
-        EncodingError,
-        UnspecifiedError,
-    }
-
+    #[derive(Debug, PartialEq, Eq, Clone, Copy)]
     pub enum ImageFormat {
-        Png,
-        Jpeg,
+        Avif,
+        Bmp,
         Gif,
-        WebP,
+        Ico,
+        Jpeg,
+        Png,
         Pnm,
         Tiff,
+        WebP,
         Tga,
         Dds,
-        Bmp,
-        Ico,
+        Farbfeld,
         Hdr,
         OpenExr,
-        Farbfeld,
-        Avif,
         Qoi,
+        Heif,
         Heic,
-        NotSupported,
     }
 
-    extern "Rust" {
-        async fn desqueeze_image(
-            image_path: &str,
-            output_path: &str,
-            image_format: Option<ImageFormat>,
-            squeeze_factor: ImageSqueezeFactor,
-        ) -> Result<String, ImageError>;
+    impl From<ImageFormat> for Option<CrateImageFormat> {
+        fn from(image_format: ImageFormat) -> Self {
+            match image_format {
+                ImageFormat::Avif => Some(CrateImageFormat::Avif),
+                ImageFormat::Bmp => Some(CrateImageFormat::Bmp),
+                ImageFormat::Gif => Some(CrateImageFormat::Gif),
+                ImageFormat::Ico => Some(CrateImageFormat::Ico),
+                ImageFormat::Jpeg => Some(CrateImageFormat::Jpeg),
+                ImageFormat::Png => Some(CrateImageFormat::Png),
+                ImageFormat::Pnm => Some(CrateImageFormat::Pnm),
+                ImageFormat::Tiff => Some(CrateImageFormat::Tiff),
+                ImageFormat::WebP => Some(CrateImageFormat::WebP),
+                ImageFormat::Tga => Some(CrateImageFormat::Tga),
+                ImageFormat::Dds => Some(CrateImageFormat::Dds),
+                ImageFormat::Farbfeld => Some(CrateImageFormat::Farbfeld),
+                ImageFormat::Hdr => Some(CrateImageFormat::Hdr),
+                ImageFormat::OpenExr => Some(CrateImageFormat::OpenExr),
+                ImageFormat::Qoi => Some(CrateImageFormat::Qoi),
+                ImageFormat::Heif | ImageFormat::Heic => None,
+            }
+        }
+    }
+
+    pub fn get_optional_image_format(image_format: ImageFormat) -> Option<CrateImageFormat> {
+        image_format.into()
+    }
+}
+
+#[cfg(test)]
+mod swift_ffi_tests {
+    use super::swift_ffi::{get_optional_image_format, ImageFormat};
+
+    #[test]
+    fn should_return_valid_format() {
+        assert_ne!(get_optional_image_format(ImageFormat::Avif), None);
+    }
+
+    #[test]
+    fn should_return_empty() {
+        assert_eq!(get_optional_image_format(ImageFormat::Heic), None)
     }
 }
