@@ -15,9 +15,10 @@
 */
 
 mod internal;
-
 use image::{ImageError, ImageFormat};
 use internal::desqueeze_image_internal;
+
+#[derive(uniffi::Enum)]
 pub enum SqueezeFactor {
     X1_33,
     X1_5,
@@ -32,15 +33,6 @@ impl SqueezeFactor {
             SqueezeFactor::X1_5 => 1.5,
             SqueezeFactor::X1_75 => 1.75,
             SqueezeFactor::X2 => 2.0,
-        }
-    }
-
-    pub fn from_swift(squeeze_factor: SqueezeFactor) -> SqueezeFactor {
-        match squeeze_factor {
-            SqueezeFactor::X1_33 => SqueezeFactor::X1_33,
-            SqueezeFactor::X1_5 => SqueezeFactor::X1_5,
-            SqueezeFactor::X1_75 => SqueezeFactor::X1_75,
-            SqueezeFactor::X2 => SqueezeFactor::X2,
         }
     }
 }

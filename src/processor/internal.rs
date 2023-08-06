@@ -1,9 +1,9 @@
 // Module: processor/internal.rs
+use super::SqueezeFactor;
 use image::{imageops::FilterType, GenericImageView, ImageError, ImageFormat};
 use std::path::{Path, PathBuf};
-use super::SqueezeFactor;
 
-pub async fn desqueeze_image_internal(
+pub(crate) async fn desqueeze_image_internal(
     image_path: &str,
     output_path: &str,
     image_format: Option<ImageFormat>,

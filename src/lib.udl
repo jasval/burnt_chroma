@@ -1,3 +1,2 @@
 namespace burnt_chroma {
-    u32 add();
 };
