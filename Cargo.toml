@@ -13,7 +13,7 @@ exclude = ["src/tests"]
 
 [lib]
 name= "burnt_chroma"
-crate-type = ["cdylib", "staticlib"]
+crate-type = ["staticlib"]
 
 [[bin]]
 # This can be whatever name makes sense for your project, but the rest of this tutorial assumes uniffi-bindgen.
