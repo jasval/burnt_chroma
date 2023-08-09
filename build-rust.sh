@@ -40,4 +40,3 @@ xcodebuild -create-xcframework \
     -output generated/BurntChroma.xcframework
 
 mv -f generated/BurntChroma.xcframework BurntChroma/Sources/BurntChroma.xcframework
-
