@@ -29,7 +29,7 @@ lipo \
 
 cargo run --release --bin uniffi-bindgen generate src/lib.udl --language swift --out-dir generated/
 
-rm -rf BurntChroma/Sources/BurntChroma.xcframework
+rm -rf Sources/BurntChroma.xcframework
 rm -rf generated/BurntChroma.xcframework
 
 xcodebuild -create-xcframework \
@@ -39,4 +39,4 @@ xcodebuild -create-xcframework \
     -headers generated/burnt_chromaFFI.h \
     -output generated/BurntChroma.xcframework
 
-mv -f generated/BurntChroma.xcframework BurntChroma/Sources/BurntChroma.xcframework
+mv -f generated/BurntChroma.xcframework Sources/BurntChroma.xcframework

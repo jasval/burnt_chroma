@@ -14,8 +14,16 @@ Cargo.lock
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# VSCode files
+.vscode/
+
 # MacOS Unwanted files:
 .DS_Store
-
-#VSCode unwanted files:
-*.vscode
+/.build
+/Packages
+/*.xcodeproj
+xcuserdata/
+DerivedData/
+.swiftpm/config/registries.json
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+.netrc
