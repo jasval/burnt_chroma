@@ -77,7 +77,7 @@ pub mod swift_ffi {
         image_format.into()
     }
 
-    #[uniffi::export]
+    // #[uniffi::export]
     pub async fn desqueeze_image(
         image_path: String,
         output_path: String,
